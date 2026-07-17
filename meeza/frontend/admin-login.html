@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دخول لوحة التحكم | ميزة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-shell" style="background:linear-gradient(135deg,#1F2937,#0C3D5C);">
+
+<div class="auth-wrap" style="min-height:100vh;">
+  <div class="auth-card">
+    <div style="text-align:center;margin-bottom:1rem;">
+      <img src="images/ChatGPT13.png" alt="ميزة" class="brand-logo-img" style="margin:0 auto;transform-origin:center;">
+    </div>
+    <h1>لوحة تحكم المالك</h1>
+    <p class="sub">دخول خاص لصاحب المنصة فقط 🔒</p>
+
+    <div id="alertBox"></div>
+
+    <form id="adminLoginForm">
+      <div class="field">
+        <label>اسم المستخدم</label>
+        <div class="input-wrap"><span class="ic">👤</span><input type="text" id="a_username" required></div>
+      </div>
+      <div class="field">
+        <label>كلمة المرور الخاصة</label>
+        <div class="input-wrap"><span class="ic">🔒</span><input type="password" id="a_password" required></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="adminSubmitBtn">دخول</button>
+    </form>
+
+    <div class="sub" style="margin-top:1.5rem;font-size:.8rem;">
+      <a href="login.html" style="color:var(--gray-600);">← الرجوع لتسجيل دخول العملاء والكباتن</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.getElementById("adminLoginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const box = document.getElementById("alertBox");
+  const btn = document.getElementById("adminSubmitBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+  try {
+    const data = await apiRequest("/api/auth/admin-login/", {
+      method: "POST",
+      body: {
+        username: document.getElementById("a_username").value,
+        password: document.getElementById("a_password").value,
+      },
+      noAuth: true,
+    });
+    Auth.setAdminToken(data.token);
+    showSuccessModal({
+      icon: "🔑",
+      title: "أهلاً بيك يا مدير المنصة",
+      message: "تم تسجيل الدخول للوحة التحكم بنجاح",
+      buttonText: "دخول اللوحة →",
+      onConfirm: () => window.location.href = "admin-dashboard.html",
+    });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-error">${err.message || "بيانات الدخول غير صحيحة"}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = "دخول";
+  }
+});
+</script>
+</body>
+</html>
